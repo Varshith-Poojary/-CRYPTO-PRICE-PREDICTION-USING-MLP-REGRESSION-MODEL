@@ -1,5 +1,5 @@
 
-# Ethereum Price Prediction Using MLP Regression Models
+# Ethereum Price Prediction Using MLP(Multilayer perceptron) Regression Models
 
 
 
