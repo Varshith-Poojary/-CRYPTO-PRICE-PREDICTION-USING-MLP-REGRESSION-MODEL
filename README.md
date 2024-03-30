@@ -24,11 +24,8 @@ These features represent temporal aspects (year, month, day) as well as daily pr
 (open, high, low) of Ethereum
 
 ```python
-import Component from 'my-project'
-
-function App() {
-  return <Component />
-}
+X = data[['Year', 'Month', 'Day', 'Open', 'High', 'Low']]
+y = data['Close']
 ```
 
 The 'Date' column in the dataset contains timestamps representing the date and time when each 
@@ -36,24 +33,38 @@ observation was recorded. Extracting the year, month, and day from the 'Date' co
 the model to capture potential seasonal or yearly patterns in Ethereum price movements. 
 
 ```python
-import Component from 'my-project'
+data['Date'] = pd.to_datetime(data['Date'])
+data['Year'] = data['Date'].dt.year
+data['Month'] = data['Date'].dt.month
+data['Day'] = data['Date'].dt.day
 
-function App() {
-  return <Component />
-}
 ```
 
 ### Model Implementation: 
-- The dataset is split into training and testing sets, with 80% allocated for training and 20% for testing.  
+- The dataset is split into training and testing sets, with 80% allocated for training and 20% for testing.
+```python
+train_size = int(0.8 * len(data))
+X_train, X_test, y_train, y_test = X[:train_size], X[train_size:], y[:train_size], y[train_size:]
+
+```
 Notably, the split was done sequentially to preserve the temporal sequence of the data. Random splitting may bias the evaluation of model performance, especially if there are systematic changes in the data over time. 
 
-- To ensure model stability and convergence, features are standardized using the StandardScaler to achieve zero mean and unit variance. 
+- To ensure model stability and convergence, features are standardized using the StandardScaler to achieve zero mean and unit variance.
+```python
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+y_train_scaled = scaler.fit_transform(y_train.values.reshape(-1, 1))
+y_test_scaled = scaler.transform(y_test.values.reshape(-1, 1))
+```
 
-- The MLP regressor is instantiated with specific hyperparameters, in our implementation, two hidden layers are configured with 100 and 50 neurons, and the "ReLU" activation function is utilized. 
-
-- The "Adam" solver is employed for optimization, with a maximum of 1000 iterations allowed for model convergence.
-
-- The MLP regressor is trained on the scaled training data to learn the relationship between the input features and the target variable. 
-
-- Predictions are subsequently made on the scaled test set. 
-
+- The MLP regressor is instantiated with specific hyperparameters, in our implementation, two hidden layers are configured with 100 and 50 neurons, and the "ReLU" activation function is utilized. The "Adam" solver is employed for optimization, with a maximum of 1000 iterations allowed for model convergence.
+```python
+mlp_regressor = MLPRegressor(hidden_layer_sizes=(100, 50), activation='relu', solver='adam', max_iter=1000, random_state=42)
+mlp_regressor.fit(X_train_scaled, y_train_scaled)
+```
+- The MLP regressor is trained on the scaled training data to learn the relationship between the input features and the target variable. Predictions are subsequently made on the scaled test set.
+```python
+y_pred = mlp_regressor.predict(X_test_scaled)
+y_pred_train=mlp_regressor.predict(X_train_scaled)
+```
