@@ -19,11 +19,13 @@ trading volume.
 
 ### Feature engineering
 
-The selected features used in our model include 'Year', 'Month', 'Day', 'Open', 'High', and 'Low'. 
+- The selected features used in our model include 'Year', 'Month', 'Day', 'Open', 'High', and 'Low'. 
 These features represent temporal aspects (year, month, day) as well as daily price fluctuations 
-(open, high, low) of Ethereum
+(open, high, low) of Ethereum.
+- The 'Adj Close' column, representing adjusted closing prices, is excluded as a feature in our analysis. Adjusted closing prices are typically adjusted for factors such as dividends, stock splits or other corporate actions, which may not directly reflects ETH's market demand.
 
 ```python
+data = data.drop(['Adj Close'], axis=1)
 X = data[['Year', 'Month', 'Day', 'Open', 'High', 'Low']]
 y = data['Close']
 ```
